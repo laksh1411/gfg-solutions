@@ -7,7 +7,7 @@ This repository automatically syncs my accepted solutions from GeeksforGeeks usi
 To sync your GFG activity to this repository, follow these steps:
 
 1. **Install the Extension:**
-   - Install the **"GfG to GitHub"** extension from the [Chrome Web Store](https://chrome.google.com/webstore/detail/gfg-to-github/oflemapblnndfndjbldpbaocpndclmji).
+   - Install the **"GfG to GitHub"** extension from the [Chrome Web Store](https://chrome.google.com/webstore/detail/gfg-to-github/gojabhkegjnlnklkkpkglaembhlknkgk).
 
 2. **Authenticate with GitHub:**
    - Open the extension and click **Authenticate**.
