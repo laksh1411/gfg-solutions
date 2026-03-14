@@ -12,7 +12,7 @@ if not GFG_HANDLE or not GFG_COOKIE:
     exit(1)
 
 # API Endpoints
-PROFILE_URL = f"https://practiceapi.geeksforgeeks.org/api/v1/user/{GFG_HANDLE}/all-solved-problems/"
+BASE_PROFILE_URL = f"https://practiceapi.geeksforgeeks.org/api/v1/user/{GFG_HANDLE}/all-solved-problems/"
 SUBMISSION_URL = "https://practiceapi.geeksforgeeks.org/api/v1/submissions/{id}/"
 
 headers = {
@@ -22,14 +22,31 @@ headers = {
 }
 
 def fetch_solved_problems():
-    try:
-        response = requests.get(PROFILE_URL, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        return data.get('results', [])
-    except Exception as e:
-        print(f"Error fetching solved problems: {e}")
-        return []
+    all_problems = []
+    url = BASE_PROFILE_URL
+    page_count = 1
+
+    while url:
+        print(f"Fetching page {page_count}...")
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            
+            results = data.get('results', [])
+            all_problems.extend(results)
+            
+            # Update URL for the next page
+            url = data.get('next')
+            page_count += 1
+            
+            if url:
+                time.sleep(1) # Delay between page requests
+        except Exception as e:
+            print(f"Error fetching solved problems on page {page_count}: {e}")
+            break
+            
+    return all_problems
 
 def fetch_submission_code(submission_id):
     try:
@@ -58,6 +75,11 @@ def save_solution(problem_name, difficulty, code, language):
     os.makedirs(dir_path, exist_ok=True)
     
     file_path = os.path.join(dir_path, f"solution.{ext}")
+    
+    # Don't overwrite if file already exists to save time/noise
+    if os.path.exists(file_path):
+        return
+
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(code)
     print(f"Saved: {file_path}")
@@ -67,6 +89,8 @@ def main():
     if not problems:
         print("No solved problems found or access denied. Check if GFG_HANDLE and GFG_COOKIE are correct.")
         return
+
+    print(f"Found {len(problems)} total solved problems. Checking for new solutions...")
 
     for problem in problems:
         problem_name = problem.get('problem_name')
@@ -79,6 +103,8 @@ def main():
         # Check if already exists to avoid redundant calls
         clean_name = problem_name.replace(" ", "_")
         dir_path = os.path.join(difficulty.capitalize(), clean_name)
+        
+        # We also check for the file in save_solution, but skipping here avoids a network call
         if os.path.exists(dir_path):
             continue
 
@@ -87,7 +113,7 @@ def main():
         
         if code and language:
             save_solution(problem_name, difficulty, code, language)
-            time.sleep(1) # Graceful delay
+            time.sleep(0.5) # Small delay to be polite
 
 if __name__ == "__main__":
     main()
