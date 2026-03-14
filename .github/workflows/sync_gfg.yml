@@ -1,0 +1,36 @@
+name: GFG Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run GFG Sync
+        env:
+          GFG_USERNAME: ${{ secrets.GFG_USERNAME }}
+          GFG_COOKIE: ${{ secrets.GFG_COOKIE }}
+        run: python gfg_sync.py
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add .
+          git commit -m "Sync GFG Solutions" || echo "No changes to commit"
+          git push
