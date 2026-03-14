@@ -4,15 +4,15 @@ import json
 import time
 
 # Configuration from Environment Variables
-GFG_USERNAME = os.getenv('GFG_USERNAME')
+GFG_HANDLE = os.getenv('GFG_HANDLE')
 GFG_COOKIE = os.getenv('GFG_COOKIE')
 
-if not GFG_USERNAME or not GFG_COOKIE:
-    print("Error: GFG_USERNAME and GFG_COOKIE must be set in Environment Variables.")
+if not GFG_HANDLE or not GFG_COOKIE:
+    print("Error: GFG_HANDLE and GFG_COOKIE must be set in Environment Variables.")
     exit(1)
 
 # API Endpoints
-PROFILE_URL = f"https://practiceapi.geeksforgeeks.org/api/v1/user/{GFG_USERNAME}/all-solved-problems/"
+PROFILE_URL = f"https://practiceapi.geeksforgeeks.org/api/v1/user/{GFG_HANDLE}/all-solved-problems/"
 SUBMISSION_URL = "https://practiceapi.geeksforgeeks.org/api/v1/submissions/{id}/"
 
 headers = {
@@ -65,7 +65,7 @@ def save_solution(problem_name, difficulty, code, language):
 def main():
     problems = fetch_solved_problems()
     if not problems:
-        print("No solved problems found or access denied.")
+        print("No solved problems found or access denied. Check if GFG_HANDLE and GFG_COOKIE are correct.")
         return
 
     for problem in problems:
@@ -77,7 +77,8 @@ def main():
             continue
 
         # Check if already exists to avoid redundant calls
-        dir_path = os.path.join(difficulty.capitalize(), problem_name.replace(" ", "_"))
+        clean_name = problem_name.replace(" ", "_")
+        dir_path = os.path.join(difficulty.capitalize(), clean_name)
         if os.path.exists(dir_path):
             continue
 

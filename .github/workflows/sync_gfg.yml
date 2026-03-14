@@ -23,7 +23,7 @@ jobs:
 
       - name: Run GFG Sync
         env:
-          GFG_USERNAME: ${{ secrets.GFG_USERNAME }}
+          GFG_HANDLE: ${{ secrets.GFG_HANDLE }}
           GFG_COOKIE: ${{ secrets.GFG_COOKIE }}
         run: python gfg_sync.py
 
